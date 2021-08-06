@@ -11,7 +11,7 @@ use nom::number::streaming::{be_u16, be_u24, be_u64, be_u8};
 use nom_derive::Parse;
 
 /// DTLS Plaintext record header
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct DTLSRecordHeader {
     pub content_type: TlsRecordType,
     pub version: TlsVersion,
@@ -27,19 +27,19 @@ pub struct DTLSRecordHeader {
 /// Each DTLS record MUST fit within a single datagram.
 ///
 /// Multiple DTLS records may be placed in a single datagram.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct DTLSPlaintext<'a> {
     pub header: DTLSRecordHeader,
     pub messages: Vec<DTLSMessage<'a>>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct DTLSRawRecord<'a> {
     pub header: DTLSRecordHeader,
     pub fragment: &'a [u8],
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct DTLSClientHello<'a> {
     pub version: TlsVersion,
     pub random: &'a [u8],
@@ -78,14 +78,14 @@ impl<'a> ClientHello<'a> for DTLSClientHello<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct DTLSHelloVerifyRequest<'a> {
     pub server_version: TlsVersion,
     pub cookie: &'a [u8],
 }
 
 /// DTLS Generic handshake message
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Hash)]
 pub struct DTLSMessageHandshake<'a> {
     pub msg_type: TlsHandshakeType,
     pub length: u32,
@@ -96,7 +96,7 @@ pub struct DTLSMessageHandshake<'a> {
 }
 
 /// DTLS Generic handshake message
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum DTLSMessageHandshakeBody<'a> {
     HelloRequest,
     ClientHello(DTLSClientHello<'a>),
@@ -118,7 +118,7 @@ pub enum DTLSMessageHandshakeBody<'a> {
 /// DTLS plaintext message
 ///
 /// Plaintext records can only be found during the handshake.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Hash)]
 pub enum DTLSMessage<'a> {
     Handshake(DTLSMessageHandshake<'a>),
     ChangeCipherSpec,

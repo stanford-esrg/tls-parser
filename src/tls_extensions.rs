@@ -23,7 +23,7 @@ use rusticata_macros::newtype_enum;
 /// defined in the [IANA Transport Layer Security (TLS)
 /// Extensions](http://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml)
 /// registry
-#[derive(Clone, Copy, Debug, PartialEq, Eq, NomBE)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, NomBE, Hash)]
 pub struct TlsExtensionType(pub u16);
 
 newtype_enum! {
@@ -95,7 +95,7 @@ impl From<TlsExtensionType> for u16 {
 
 /// TLS extensions
 ///
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Hash)]
 pub enum TlsExtension<'a> {
     SNI(Vec<(SNIType, &'a [u8])>),
     MaxFragmentLength(u8),
@@ -175,13 +175,13 @@ impl<'a> From<&'a TlsExtension<'a>> for TlsExtensionType {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct KeyShareEntry<'a> {
     pub group: NamedGroup, // NamedGroup
     pub kx: &'a [u8],      // Key Exchange Data
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, NomBE)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, NomBE, Hash)]
 pub struct PskKeyExchangeMode(pub u8);
 
 newtype_enum! {
@@ -191,7 +191,7 @@ impl PskKeyExchangeMode {
 }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, NomBE)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, NomBE, Hash)]
 pub struct SNIType(pub u8);
 
 newtype_enum! {
@@ -200,7 +200,7 @@ impl display SNIType {
 }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, NomBE)]
+#[derive(Clone, Copy, PartialEq, Eq, NomBE, Hash)]
 pub struct CertificateStatusType(pub u8);
 
 newtype_enum! {
@@ -209,7 +209,7 @@ impl debug CertificateStatusType {
 }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct OidFilter<'a> {
     pub cert_ext_oid: &'a [u8],
     pub cert_ext_val: &'a [u8],

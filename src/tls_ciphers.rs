@@ -18,7 +18,11 @@ pub struct CipherSuiteNotFound(());
 
 enum_from_primitive! {
 /// Key exchange methods
+<<<<<<< HEAD
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+=======
+#[derive(Clone, Copy, Debug, PartialEq, Hash)]
+>>>>>>> add hash trait to all partialeq structs
 #[repr(u8)]
 pub enum TlsCipherKx {
     Null = 0,
@@ -38,7 +42,11 @@ pub enum TlsCipherKx {
 
 enum_from_primitive! {
 /// Authentication methods
+<<<<<<< HEAD
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+=======
+#[derive(Clone, Copy, Debug, PartialEq, Hash)]
+>>>>>>> add hash trait to all partialeq structs
 #[repr(u8)]
 pub enum TlsCipherAu {
     Null = 0,
@@ -58,7 +66,7 @@ pub enum TlsCipherAu {
 
 enum_from_primitive! {
 /// Encryption methods
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[repr(u8)]
 pub enum TlsCipherEnc {
     Null,
@@ -78,7 +86,7 @@ pub enum TlsCipherEnc {
 
 enum_from_primitive! {
 /// Encryption modes
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[repr(u8)]
 pub enum TlsCipherEncMode {
     Null,
@@ -90,7 +98,7 @@ pub enum TlsCipherEncMode {
 
 enum_from_primitive! {
 /// Message Authentication Code (MAC) methods
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[repr(u8)]
 pub enum TlsCipherMac {
     Null,

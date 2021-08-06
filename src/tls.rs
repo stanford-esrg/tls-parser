@@ -28,7 +28,7 @@ pub const MAX_RECORD_LEN: u16 = 1 << 14;
 /// Handshake types are defined in [RFC5246](https://tools.ietf.org/html/rfc5246) and
 /// the [IANA HandshakeType
 /// Registry](https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-7)
-#[derive(Clone, Copy, PartialEq, Eq, NomBE)]
+#[derive(Clone, Copy, PartialEq, Eq, NomBE, Hash)]
 pub struct TlsHandshakeType(pub u8);
 
 newtype_enum! {
@@ -66,7 +66,7 @@ impl From<TlsHandshakeType> for u8 {
 ///
 /// Only the TLS version defined in the TLS message header is meaningful, the
 /// version defined in the record should be ignored or set to TLS 1.0
-#[derive(Clone, Copy, Default, PartialEq, Eq, NomBE)]
+#[derive(Clone, Copy, Default, PartialEq, Eq, NomBE, Hash)]
 pub struct TlsVersion(pub u16);
 
 impl TlsVersion {
@@ -109,7 +109,7 @@ impl fmt::LowerHex for TlsVersion {
 }
 
 /// Heartbeat type, as defined in [RFC6520](https://tools.ietf.org/html/rfc6520) section 3
-#[derive(Clone, Copy, PartialEq, Eq, NomBE)]
+#[derive(Clone, Copy, PartialEq, Eq, NomBE, Hash)]
 pub struct TlsHeartbeatMessageType(pub u8);
 
 newtype_enum! {
@@ -126,7 +126,7 @@ impl From<TlsHeartbeatMessageType> for u8 {
 }
 
 /// Content type, as defined in IANA TLS ContentType registry
-#[derive(Clone, Copy, PartialEq, Eq, NomBE)]
+#[derive(Clone, Copy, PartialEq, Eq, NomBE, Hash)]
 pub struct TlsRecordType(pub u8);
 
 newtype_enum! {
@@ -145,7 +145,7 @@ impl From<TlsRecordType> for u8 {
     }
 }
 
-#[derive(Clone, Copy, Default, PartialEq, Eq, NomBE)]
+#[derive(Clone, Copy, Default, PartialEq, Eq, NomBE, Hash)]
 pub struct TlsCompressionID(pub u8);
 
 newtype_enum! {
@@ -173,7 +173,7 @@ impl AsRef<u8> for TlsCompressionID {
     }
 }
 
-#[derive(Clone, Copy, Default, PartialEq, Eq, NomBE)]
+#[derive(Clone, Copy, Default, PartialEq, Eq, NomBE, Hash)]
 pub struct TlsCipherSuiteID(pub u16);
 
 impl TlsCipherSuiteID {
@@ -256,7 +256,7 @@ pub trait ClientHello<'a> {
 ///
 /// Some fields are unparsed (for performance reasons), for ex to parse `ext`,
 /// call the `parse_tls_extensions` function.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Hash)]
 pub struct TlsClientHelloContents<'a> {
     /// TLS version of message
     pub version: TlsVersion,
@@ -325,7 +325,7 @@ impl<'a> ClientHello<'a> for TlsClientHelloContents<'a> {
 }
 
 /// TLS Server Hello (from TLS 1.0 to TLS 1.2)
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Hash)]
 pub struct TlsServerHelloContents<'a> {
     pub version: TlsVersion,
     pub random: &'a [u8],
@@ -337,7 +337,7 @@ pub struct TlsServerHelloContents<'a> {
 }
 
 /// TLS Server Hello (TLS 1.3 draft 18)
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Hash)]
 pub struct TlsServerHelloV13Draft18Contents<'a> {
     pub version: TlsVersion,
     pub random: &'a [u8],
@@ -347,7 +347,7 @@ pub struct TlsServerHelloV13Draft18Contents<'a> {
 }
 
 /// TLS Hello Retry Request (TLS 1.3)
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Hash)]
 pub struct TlsHelloRetryRequestContents<'a> {
     pub version: TlsVersion,
     pub cipher: TlsCipherSuiteID,
@@ -384,7 +384,7 @@ impl<'a> TlsServerHelloContents<'a> {
 }
 
 /// Session ticket, as defined in [RFC5077](https://tools.ietf.org/html/rfc5077)
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct TlsNewSessionTicketContent<'a> {
     pub ticket_lifetime_hint: u32,
     pub ticket: &'a [u8],
@@ -393,14 +393,14 @@ pub struct TlsNewSessionTicketContent<'a> {
 /// A raw certificate, which should be a DER-encoded X.509 certificate.
 ///
 /// See [RFC5280](https://tools.ietf.org/html/rfc5280) for X509v3 certificate format.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Hash)]
 pub struct RawCertificate<'a> {
     pub data: &'a [u8],
 }
 
 /// The certificate chain, usually composed of the certificate, and all
 /// required certificate authorities.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct TlsCertificateContents<'a> {
     pub cert_chain: Vec<RawCertificate<'a>>,
 }
@@ -408,7 +408,7 @@ pub struct TlsCertificateContents<'a> {
 /// Certificate request, as defined in [RFC5246](https://tools.ietf.org/html/rfc5246) section 7.4.4
 ///
 /// Note: TLS 1.2 adds SignatureAndHashAlgorithm (chapter 7.4.4) but do not declare it in A.4.2
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct TlsCertificateRequestContents<'a> {
     pub cert_types: Vec<u8>,
     pub sig_hash_algs: Option<Vec<u16>>,
@@ -421,7 +421,7 @@ pub struct TlsCertificateRequestContents<'a> {
 ///
 /// This is an opaque struct, since the content depends on the selected
 /// key exchange method.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Hash)]
 pub struct TlsServerKeyExchangeContents<'a> {
     pub parameters: &'a [u8],
 }
@@ -429,7 +429,7 @@ pub struct TlsServerKeyExchangeContents<'a> {
 /// Client key exchange parameters
 ///
 /// Content depends on the selected key exchange method.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Hash)]
 pub enum TlsClientKeyExchangeContents<'a> {
     Dh(&'a [u8]),
     Ecdh(ECPoint<'a>),
@@ -437,7 +437,7 @@ pub enum TlsClientKeyExchangeContents<'a> {
 }
 
 /// Certificate status response, as defined in [RFC6066](https://tools.ietf.org/html/rfc6066) section 8
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct TlsCertificateStatusContents<'a> {
     pub status_type: u8,
     pub blob: &'a [u8],
@@ -445,14 +445,14 @@ pub struct TlsCertificateStatusContents<'a> {
 
 /// Next protocol response, defined in
 /// [draft-agl-tls-nextprotoneg-03](https://tools.ietf.org/html/draft-agl-tls-nextprotoneg-03)
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct TlsNextProtocolContent<'a> {
     pub selected_protocol: &'a [u8],
     pub padding: &'a [u8],
 }
 
 /// Key update request (TLS 1.3)
-#[derive(Copy, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Hash, Eq)]
 pub struct KeyUpdateRequest(pub u8);
 
 newtype_enum! {
@@ -463,7 +463,7 @@ impl KeyUpdateRequest {
 }
 
 /// Generic handshake message
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub enum TlsMessageHandshake<'a> {
     HelloRequest,
     ClientHello(TlsClientHelloContents<'a>),
@@ -488,7 +488,7 @@ pub enum TlsMessageHandshake<'a> {
 ///
 /// Since this message can only be sent after the handshake, data is
 /// stored as opaque.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct TlsMessageApplicationData<'a> {
     pub blob: &'a [u8],
 }
@@ -497,7 +497,7 @@ pub struct TlsMessageApplicationData<'a> {
 ///
 /// Heartbeat messages should not be sent during handshake, but in practise
 /// they can (and this caused heartbleed).
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct TlsMessageHeartbeat<'a> {
     pub heartbeat_type: TlsHeartbeatMessageType,
     pub payload_len: u16,
@@ -505,7 +505,7 @@ pub struct TlsMessageHeartbeat<'a> {
 }
 
 /// TLS record header
-#[derive(Clone, Copy, PartialEq, NomBE)]
+#[derive(Clone, Copy, PartialEq, NomBE, Hash)]
 pub struct TlsRecordHeader {
     pub record_type: TlsRecordType,
     pub version: TlsVersion,
@@ -515,7 +515,7 @@ pub struct TlsRecordHeader {
 /// TLS plaintext message
 ///
 /// Plaintext records can only be found during the handshake.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub enum TlsMessage<'a> {
     Handshake(TlsMessageHandshake<'a>),
     ChangeCipherSpec,
@@ -528,7 +528,7 @@ pub enum TlsMessage<'a> {
 ///
 /// A TLS record can contain multiple messages (sharing the same record type).
 /// Plaintext records can only be found during the handshake.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct TlsPlaintext<'a> {
     pub hdr: TlsRecordHeader,
     pub msg: Vec<TlsMessage<'a>>,
@@ -537,13 +537,13 @@ pub struct TlsPlaintext<'a> {
 /// TLS encrypted data
 ///
 /// This struct only contains an opaque pointer (data are encrypted).
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct TlsEncryptedContent<'a> {
     pub blob: &'a [u8],
 }
 
 /// Encrypted TLS record (containing opaque data)
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct TlsEncrypted<'a> {
     pub hdr: TlsRecordHeader,
     pub msg: TlsEncryptedContent<'a>,
@@ -552,7 +552,7 @@ pub struct TlsEncrypted<'a> {
 /// Tls Record with raw (unparsed) data
 ///
 /// Use `parse_tls_raw_record` to parse content
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 pub struct TlsRawRecord<'a> {
     pub hdr: TlsRecordHeader,
     pub data: &'a [u8],

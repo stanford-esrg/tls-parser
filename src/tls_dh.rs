@@ -4,7 +4,7 @@ use nom::IResult;
 use nom_derive::*;
 
 /// Diffie-Hellman parameters, defined in [RFC5246] section 7.4.3
-#[derive(PartialEq, NomBE)]
+#[derive(PartialEq, NomBE, Hash)]
 pub struct ServerDHParams<'a> {
     /// The prime modulus used for the Diffie-Hellman operation.
     #[nom(Parse = "length_data(be_u16)")]

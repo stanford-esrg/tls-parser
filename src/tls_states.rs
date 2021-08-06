@@ -9,7 +9,7 @@ pub enum StateChangeError {
 }
 
 /// TLS machine possible states
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Hash)]
 pub enum TlsState {
     None,
     ClientHello,

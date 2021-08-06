@@ -7,7 +7,7 @@ use nom_derive::*;
 use rusticata_macros::newtype_enum;
 
 /// Hash algorithms, as defined in [RFC5246]
-#[derive(Clone, Debug, PartialEq, Eq, Nom)]
+#[derive(Clone, Debug, PartialEq, Eq, Nom, Hash)]
 pub struct HashAlgorithm(pub u8);
 
 newtype_enum! {
@@ -24,7 +24,7 @@ impl display HashAlgorithm {
 }
 
 /// Signature algorithms, as defined in [RFC5246]
-#[derive(Clone, Debug, PartialEq, Eq, Nom)]
+#[derive(Clone, Debug, PartialEq, Eq, Nom, Hash)]
 pub struct SignAlgorithm(pub u8);
 
 newtype_enum! {
@@ -38,14 +38,14 @@ impl display SignAlgorithm {
 }
 }
 
-#[derive(Clone, PartialEq, Nom)]
+#[derive(Clone, PartialEq, Nom, Hash)]
 pub struct SignatureAndHashAlgorithm {
     pub hash: HashAlgorithm,
     pub sign: SignAlgorithm,
 }
 
 /// Signature algorithms, as defined in [RFC8446] 4.2.3
-#[derive(Debug, PartialEq, Eq, Nom)]
+#[derive(Debug, PartialEq, Hash, Eq, Nom)]
 pub struct SignatureScheme(pub u16);
 
 newtype_enum! {
@@ -108,7 +108,7 @@ impl SignatureScheme {
 /// has no algorithm definition.
 /// This should be deprecated in favor if
 /// DigitallySigned structure from [RFC5246] section 4.7
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Hash)]
 pub struct DigitallySigned<'a> {
     pub alg: Option<SignatureAndHashAlgorithm>,
     // pub alg: Option<u16>, // SignatureScheme
