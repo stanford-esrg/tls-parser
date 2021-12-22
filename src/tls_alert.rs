@@ -1,5 +1,6 @@
 use nom_derive::*;
 use rusticata_macros::newtype_enum;
+use serde::Serialize;
 
 /// TLS alert severity
 #[derive(Clone, Copy, Debug, PartialEq, Hash, Eq, Nom)]
@@ -16,7 +17,7 @@ impl display TlsAlertSeverity {
 ///
 /// Alerts are defined in the [IANA TLS Alert
 /// Registry](https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-6)
-#[derive(Clone, Copy, Debug, PartialEq, Hash, Eq, Nom)]
+#[derive(Clone, Copy, Debug, PartialEq, Hash, Eq, Nom, Serialize)]
 pub struct TlsAlertDescription(pub u8);
 
 newtype_enum! {

@@ -13,6 +13,7 @@ use nom::multi::{length_count, length_data, many0, many1};
 use nom::number::streaming::{be_u16, be_u24, be_u32, be_u8};
 use nom_derive::*;
 use rusticata_macros::newtype_enum;
+use serde::Serialize;
 
 use crate::tls_alert::*;
 use crate::tls_ciphers::*;
@@ -66,7 +67,7 @@ impl From<TlsHandshakeType> for u8 {
 ///
 /// Only the TLS version defined in the TLS message header is meaningful, the
 /// version defined in the record should be ignored or set to TLS 1.0
-#[derive(Clone, Copy, Default, PartialEq, Eq, NomBE, Hash)]
+#[derive(Clone, Copy, Default, PartialEq, Eq, NomBE, Hash, Serialize)]
 pub struct TlsVersion(pub u16);
 
 impl TlsVersion {
@@ -145,7 +146,7 @@ impl From<TlsRecordType> for u8 {
     }
 }
 
-#[derive(Clone, Copy, Default, PartialEq, Eq, NomBE, Hash)]
+#[derive(Clone, Copy, Default, PartialEq, Eq, NomBE, Hash, Serialize)]
 pub struct TlsCompressionID(pub u8);
 
 newtype_enum! {
