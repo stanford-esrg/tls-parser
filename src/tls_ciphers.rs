@@ -18,11 +18,7 @@ pub struct CipherSuiteNotFound(());
 
 enum_from_primitive! {
 /// Key exchange methods
-<<<<<<< HEAD
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-=======
-#[derive(Clone, Copy, Debug, PartialEq, Hash)]
->>>>>>> add hash trait to all partialeq structs
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[repr(u8)]
 pub enum TlsCipherKx {
     Null = 0,
@@ -42,11 +38,7 @@ pub enum TlsCipherKx {
 
 enum_from_primitive! {
 /// Authentication methods
-<<<<<<< HEAD
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-=======
-#[derive(Clone, Copy, Debug, PartialEq, Hash)]
->>>>>>> add hash trait to all partialeq structs
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[repr(u8)]
 pub enum TlsCipherAu {
     Null = 0,
