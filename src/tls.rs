@@ -175,7 +175,7 @@ impl AsRef<u8> for TlsCompressionID {
     }
 }
 
-#[derive(Clone, Copy, Default, PartialEq, Eq, NomBE, Hash)]
+#[derive(Clone, Copy, Default, PartialEq, Eq, NomBE, Hash, Serialize)]
 pub struct TlsCipherSuiteID(pub u16);
 
 impl TlsCipherSuiteID {

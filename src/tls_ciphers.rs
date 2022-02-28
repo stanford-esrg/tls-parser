@@ -9,8 +9,8 @@
 #![allow(clippy::unreadable_literal)]
 
 use core::convert::TryFrom;
-use serde::Serialize;
 use num_enum::TryFromPrimitive;
+use serde::Serialize;
 
 use crate::TlsCipherSuiteID;
 
