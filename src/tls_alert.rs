@@ -3,7 +3,7 @@ use rusticata_macros::newtype_enum;
 use serde::Serialize;
 
 /// TLS alert severity
-#[derive(Clone, Copy, Debug, PartialEq, Hash, Eq, Nom)]
+#[derive(Clone, Copy, Debug, PartialEq, Hash, Eq, Nom, Serialize)]
 pub struct TlsAlertSeverity(pub u8);
 
 newtype_enum! {
@@ -60,7 +60,7 @@ impl display TlsAlertDescription {
 }
 
 /// TLS alert message
-#[derive(Clone, PartialEq, Hash, Nom)]
+#[derive(Clone, Copy, PartialEq, Hash, Nom, Serialize)]
 pub struct TlsMessageAlert {
     /// Should match a [TlsAlertSeverity](enum.TlsAlertSeverity.html) value
     pub severity: TlsAlertSeverity,
