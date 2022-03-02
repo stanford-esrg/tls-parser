@@ -5,11 +5,12 @@ use nom::number::streaming::be_u8;
 use nom::{Err, IResult};
 use nom_derive::*;
 use rusticata_macros::newtype_enum;
+use serde::Serialize;
 
 /// Named curves, as defined in [RFC4492](https://tools.ietf.org/html/rfc4492), [RFC7027](https://tools.ietf.org/html/rfc7027), [RFC7919](https://tools.ietf.org/html/rfc7919) and
 /// [IANA Supported Groups
 /// Registry](https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-8)
-#[derive(Clone, Copy, PartialEq, Eq, NomBE, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, NomBE, Hash, Serialize)]
 pub struct NamedGroup(pub u16);
 
 newtype_enum! {
@@ -99,7 +100,7 @@ impl NamedGroup {
 /// Elliptic curve
 ///
 /// a and b specify the coefficients of the curve
-#[derive(Debug, PartialEq, NomBE, Hash)]
+#[derive(Debug, PartialEq, NomBE, Hash, Serialize)]
 pub struct ECCurve<'a> {
     #[nom(Parse = "length_data(be_u8)")]
     pub a: &'a [u8],
@@ -110,7 +111,7 @@ pub struct ECCurve<'a> {
 /// Elliptic curve types, as defined in the
 /// [IANA EC Curve Type Registry
 /// Registry](https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-10)
-#[derive(Clone, Copy, PartialEq, Eq, NomBE, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, NomBE, Hash, Serialize)]
 pub struct ECCurveType(pub u8);
 
 newtype_enum! {
@@ -122,7 +123,7 @@ impl display ECCurveType {
 }
 
 /// EC Point
-#[derive(Clone, Debug, PartialEq, NomBE, Hash)]
+#[derive(Clone, Debug, PartialEq, NomBE, Hash, Serialize)]
 pub struct ECPoint<'a> {
     #[nom(Parse = "length_data(be_u8)")]
     pub point: &'a [u8],
@@ -130,7 +131,7 @@ pub struct ECPoint<'a> {
 
 /// Elliptic curve parameters, conveyed verbosely as a prime field, as
 /// defined in [RFC4492](https://tools.ietf.org/html/rfc4492) section 5.4
-#[derive(Debug, PartialEq, NomBE, Hash)]
+#[derive(Debug, PartialEq, NomBE, Hash, Serialize)]
 pub struct ExplicitPrimeContent<'a> {
     #[nom(Parse = "length_data(be_u8)")]
     pub prime_p: &'a [u8],
@@ -143,7 +144,7 @@ pub struct ExplicitPrimeContent<'a> {
 }
 
 /// Elliptic curve parameters content (depending on EC type)
-#[derive(PartialEq, Hash, Nom)]
+#[derive(PartialEq, Hash, Nom, Serialize)]
 #[nom(Selector = "ECCurveType")]
 pub enum ECParametersContent<'a> {
     #[nom(Selector = "ECCurveType::ExplicitPrime")]
@@ -157,7 +158,7 @@ pub enum ECParametersContent<'a> {
 
 /// Elliptic curve parameters,
 /// defined in [RFC4492](https://tools.ietf.org/html/rfc4492) section 5.4
-#[derive(PartialEq, NomBE, Hash)]
+#[derive(PartialEq, NomBE, Hash, Serialize)]
 pub struct ECParameters<'a> {
     /// Should match a [ECCurveType](enum.ECCurveType.html) value
     pub curve_type: ECCurveType,

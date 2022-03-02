@@ -18,12 +18,13 @@ use nom::number::streaming::{be_u16, be_u32, be_u8};
 use nom::{Err, IResult};
 use nom_derive::{NomBE, Parse};
 use rusticata_macros::newtype_enum;
+use serde::Serialize;
 
 /// TLS extension types,
 /// defined in the [IANA Transport Layer Security (TLS)
 /// Extensions](http://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml)
 /// registry
-#[derive(Clone, Copy, Debug, PartialEq, Eq, NomBE, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, NomBE, Hash, Serialize)]
 pub struct TlsExtensionType(pub u16);
 
 newtype_enum! {
@@ -95,7 +96,7 @@ impl From<TlsExtensionType> for u16 {
 
 /// TLS extensions
 ///
-#[derive(Clone, PartialEq, Hash)]
+#[derive(Clone, PartialEq, Hash, Serialize)]
 pub enum TlsExtension<'a> {
     SNI(Vec<(SNIType, &'a [u8])>),
     MaxFragmentLength(u8),
@@ -191,7 +192,7 @@ impl PskKeyExchangeMode {
 }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, NomBE, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, NomBE, Hash, Serialize)]
 pub struct SNIType(pub u8);
 
 newtype_enum! {
@@ -200,7 +201,7 @@ impl display SNIType {
 }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, NomBE, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, NomBE, Hash, Serialize)]
 pub struct CertificateStatusType(pub u8);
 
 newtype_enum! {
@@ -209,7 +210,7 @@ impl debug CertificateStatusType {
 }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash)]
+#[derive(Clone, Debug, PartialEq, Hash, Serialize)]
 pub struct OidFilter<'a> {
     pub cert_ext_oid: &'a [u8],
     pub cert_ext_val: &'a [u8],
