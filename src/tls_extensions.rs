@@ -55,7 +55,7 @@ impl display TlsExtensionType {
     ExtendedMasterSecret                = 23, // [RFC7627]
     TokenBinding                        = 24,
     CachedInfo                          = 25,
-
+    CompressCertificate                 = 27, // [RFC8879]
     RecordSizeLimit                     = 28, // [RFC8449]
 
     SessionTicketTLS                    = 35,
@@ -104,6 +104,7 @@ pub enum TlsExtension<'a> {
     EllipticCurves(Vec<NamedGroup>),
     EcPointFormats(&'a [u8]),
     SignatureAlgorithms(Vec<u16>),
+    CompressCertificate(&'a [u8]),
     RecordSizeLimit(u16),
     SessionTicket(&'a [u8]),
     KeyShareOld(&'a [u8]),
@@ -150,6 +151,7 @@ impl<'a> From<&'a TlsExtension<'a>> for TlsExtensionType {
             TlsExtension::EllipticCurves(_)             => TlsExtensionType::SupportedGroups,
             TlsExtension::EcPointFormats(_)             => TlsExtensionType::EcPointFormats,
             TlsExtension::SignatureAlgorithms(_)        => TlsExtensionType::SignatureAlgorithms,
+            TlsExtension::CompressCertificate(_)        => TlsExtensionType::CompressCertificate,
             TlsExtension::SessionTicket(_)              => TlsExtensionType::SessionTicketTLS,
             TlsExtension::RecordSizeLimit(_)            => TlsExtensionType::RecordSizeLimit,
             TlsExtension::KeyShareOld(_)                => TlsExtensionType::KeyShareOld,
@@ -467,6 +469,21 @@ pub fn parse_tls_extension_pre_shared_key(i: &[u8]) -> IResult<&[u8], TlsExtensi
     })(i)
 }
 
+fn parse_tls_extension_compress_certificate_content(
+    i: &[u8],
+    ext_len: u16,
+) -> IResult<&[u8], TlsExtension> {
+    map(take(ext_len), TlsExtension::CompressCertificate)(i)
+}
+
+pub fn parse_tls_extension_compress_certificate(i: &[u8]) -> IResult<&[u8], TlsExtension> {
+    let (i, _) = tag([0x00, 0x1b])(i)?;
+    let (i, ext_len) = be_u16(i)?;
+    map_parser(take(ext_len), move |d| {
+        parse_tls_extension_compress_certificate_content(d, ext_len)
+    })(i)
+}
+
 fn parse_tls_extension_early_data_content(i: &[u8], ext_len: u16) -> IResult<&[u8], TlsExtension> {
     map(cond(ext_len > 0, be_u32), TlsExtension::EarlyData)(i)
 }
@@ -632,6 +649,7 @@ pub fn parse_tls_client_hello_extension(i: &[u8]) -> IResult<&[u8], TlsExtension
         21 => parse_tls_extension_padding_content(ext_data, ext_len),
         22 => parse_tls_extension_encrypt_then_mac_content(ext_data, ext_len),
         23 => parse_tls_extension_extended_master_secret_content(ext_data, ext_len),
+        27 => parse_tls_extension_compress_certificate_content(ext_data, ext_len),
         28 => parse_tls_extension_record_size_limit(ext_data),
         35 => parse_tls_extension_session_ticket_content(ext_data, ext_len),
         41 => parse_tls_extension_pre_shared_key_content(ext_data, ext_len),
@@ -672,6 +690,7 @@ pub fn parse_tls_server_hello_extension(i: &[u8]) -> IResult<&[u8], TlsExtension
         18 => parse_tls_extension_signed_certificate_timestamp_content(ext_data),
         21 => parse_tls_extension_encrypt_then_mac_content(ext_data, ext_len),
         23 => parse_tls_extension_extended_master_secret_content(ext_data, ext_len),
+        27 => parse_tls_extension_compress_certificate_content(ext_data, ext_len),
         28 => parse_tls_extension_record_size_limit(ext_data),
         35 => parse_tls_extension_session_ticket_content(ext_data, ext_len),
         41 => parse_tls_extension_pre_shared_key_content(ext_data, ext_len),
@@ -710,6 +729,7 @@ pub fn parse_tls_extension(i: &[u8]) -> IResult<&[u8], TlsExtension> {
         21 => parse_tls_extension_padding_content(ext_data, ext_len),
         22 => parse_tls_extension_encrypt_then_mac_content(ext_data, ext_len),
         23 => parse_tls_extension_extended_master_secret_content(ext_data, ext_len),
+        27 => parse_tls_extension_compress_certificate_content(ext_data, ext_len),
         28 => parse_tls_extension_record_size_limit(ext_data),
         35 => parse_tls_extension_session_ticket_content(ext_data, ext_len),
         40 => parse_tls_extension_key_share_old_content(ext_data, ext_len),

@@ -202,6 +202,13 @@ impl<'a> fmt::Debug for TlsExtension<'a> {
             TlsExtension::PreSharedKey(data) => {
                 write!(fmt, "TlsExtension::PreSharedKey(data={:?})", HexSlice(data))
             }
+            TlsExtension::CompressCertificate(data) => {
+                write!(
+                    fmt,
+                    "TlsExtension::CompressCertificate(data={:?})",
+                    HexSlice(data)
+                )
+            }
             TlsExtension::EarlyData(o) => write!(fmt, "TlsExtension::EarlyData({:?})", o),
             TlsExtension::SupportedVersions(ref v) => {
                 let v2: Vec<_> = v.iter().map(|c| format!("{}", c)).collect();
