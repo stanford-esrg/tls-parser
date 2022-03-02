@@ -90,6 +90,13 @@ impl debug TlsVersion {
     Tls13Draft21 = 0x7f15,
     Tls13Draft22 = 0x7f16,
     Tls13Draft23 = 0x7f17,
+    Tls13Draft24 = 0x7f18,
+    Tls13Draft25 = 0x7f19,
+    Tls13Draft26 = 0x7f1a,
+    Tls13Draft27 = 0x7f1b,
+    Tls13Draft28 = 0x7f1c,
+    Tls13FbDraft23 = 0xfb17,
+    Tls13FbDraft26 = 0xfb1a,
 
     DTls10       = 0xfeff,
     DTls11       = 0xfefe,
