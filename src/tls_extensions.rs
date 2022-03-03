@@ -12,10 +12,10 @@ use alloc::{vec, vec::Vec};
 use core::convert::From;
 use nom::bytes::streaming::{tag, take};
 use nom::combinator::{complete, cond, map, map_parser, opt, verify};
-use nom::error::{make_error, ErrorKind};
+// use nom::error::{make_error, ErrorKind};
 use nom::multi::{length_data, many0};
 use nom::number::streaming::{be_u16, be_u32, be_u8};
-use nom::{Err, IResult};
+use nom::{IResult};
 use nom_derive::{NomBE, Parse};
 use rusticata_macros::newtype_enum;
 use serde::Serialize;
@@ -378,11 +378,11 @@ pub fn parse_tls_extension_signed_certificate_timestamp_content(
 /// Encrypt-then-MAC is defined in [RFC7366]
 fn parse_tls_extension_encrypt_then_mac_content(
     i: &[u8],
-    ext_len: u16,
+    _ext_len: u16,
 ) -> IResult<&[u8], TlsExtension> {
-    if ext_len != 0 {
-        return Err(Err::Error(make_error(i, ErrorKind::Verify)));
-    }
+    // if ext_len != 0 {
+    //     return Err(Err::Error(make_error(i, ErrorKind::Verify)));
+    // }
     Ok((i, TlsExtension::EncryptThenMac))
 }
 
@@ -398,11 +398,11 @@ pub fn parse_tls_extension_encrypt_then_mac(i: &[u8]) -> IResult<&[u8], TlsExten
 /// Extended Master Secret is defined in [RFC7627]
 fn parse_tls_extension_extended_master_secret_content(
     i: &[u8],
-    ext_len: u16,
+    _ext_len: u16,
 ) -> IResult<&[u8], TlsExtension> {
-    if ext_len != 0 {
-        return Err(Err::Error(make_error(i, ErrorKind::Verify)));
-    }
+    // if ext_len != 0 {
+    //     return Err(Err::Error(make_error(i, ErrorKind::Verify)));
+    // }
     Ok((i, TlsExtension::ExtendedMasterSecret))
 }
 
@@ -518,9 +518,9 @@ fn parse_tls_extension_supported_versions_content(
         })(i)
     } else {
         let (i, _) = be_u8(i)?;
-        if ext_len == 0 {
-            return Err(Err::Error(make_error(i, ErrorKind::Verify)));
-        }
+        // if ext_len == 0 {
+        //     return Err(Err::Error(make_error(i, ErrorKind::Verify)));
+        // }
         let (i, l) = map_parser(take(ext_len - 1), parse_tls_versions)(i)?;
         Ok((i, TlsExtension::SupportedVersions(l)))
     }
@@ -563,10 +563,10 @@ pub fn parse_tls_extension_psk_key_exchange_modes(i: &[u8]) -> IResult<&[u8], Tl
 }
 
 /// Defined in RFC-draft-agl-tls-nextprotoneg-03. Deprecated in favour of ALPN.
-fn parse_tls_extension_npn_content(i: &[u8], ext_len: u16) -> IResult<&[u8], TlsExtension> {
-    if ext_len != 0 {
-        return Err(Err::Error(make_error(i, ErrorKind::Verify)));
-    }
+fn parse_tls_extension_npn_content(i: &[u8], _ext_len: u16) -> IResult<&[u8], TlsExtension> {
+    // if ext_len != 0 {
+    //     return Err(Err::Error(make_error(i, ErrorKind::Verify)));
+    // }
     Ok((i, TlsExtension::NextProtocolNegotiation))
 }
 
@@ -611,11 +611,11 @@ fn parse_tls_extension_oid_filters(i: &[u8]) -> IResult<&[u8], TlsExtension> {
 /// Defined in TLS 1.3 draft 20
 fn parse_tls_extension_post_handshake_auth_content(
     i: &[u8],
-    ext_len: u16,
+    _ext_len: u16,
 ) -> IResult<&[u8], TlsExtension> {
-    if ext_len != 0 {
-        return Err(Err::Error(make_error(i, ErrorKind::Verify)));
-    }
+    // if ext_len != 0 {
+    //     return Err(Err::Error(make_error(i, ErrorKind::Verify)));
+    // }
     Ok((i, TlsExtension::PostHandshakeAuth))
 }
 
