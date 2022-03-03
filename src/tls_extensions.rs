@@ -57,9 +57,17 @@ impl display TlsExtensionType {
     CachedInfo                          = 25,
     CompressCertificate                 = 27, // [RFC8879]
     RecordSizeLimit                     = 28, // [RFC8449]
-
+    PwdProtect                          = 29,
+    PwdClear                            = 30,
+    PasswordSalt                        = 31,
+    TicketPinning                       = 32,
+    TlsCertWithExternPsk                = 33,
+    DelegatedCredentials                = 34,
     SessionTicketTLS                    = 35,
-
+    Tlmsp                               = 36,
+    TlmspProxying                       = 37,
+    TlmspDelegate                       = 38,
+    SupportedEktCiphers                 = 39,
     KeyShareOld                         = 40, // moved to 51 in TLS 1.3 draft 23
     PreSharedKey                        = 41, // [RFC8446]
     EarlyData                           = 42, // [RFC8446]
@@ -67,11 +75,19 @@ impl display TlsExtensionType {
     Cookie                              = 44, // [RFC8446]
     PskExchangeModes                    = 45, // [RFC8446]
     TicketEarlyDataInfo                 = 46, // TLS 1.3 draft 18, removed in draft 19
-    CertificateAuthorities              = 47,
+    CertificateAuthorities              = 47, // [RFC8446]
     OidFilters                          = 48, // [RFC8446]
-    PostHandshakeAuth                   = 49, // TLS 1.3 draft 20
-    SigAlgorithmsCert                   = 50, // TLS 1.3 draft 23
-    KeyShare                            = 51, // TLS 1.3 draft 23
+    PostHandshakeAuth                   = 49, // [RFC8446]
+    SigAlgorithmsCert                   = 50, // [RFC8446]
+    KeyShare                            = 51, // [RFC8446]
+    TransparencyInfo                    = 52, // [RFC8446]
+    ConnectionIdOld                     = 53, // deprecated
+    ConnectionId                        = 54,
+    ExternalIdHash                      = 55, // [RFC8844]
+    ExternalSessionId                   = 56, // [RFC8844]
+    QuicTransportParameters             = 57, // [RFC9001]
+    TicketRequest                       = 58,
+    DnssecChain                         = 58,
 
     NextProtocolNegotiation             = 13172,
 
