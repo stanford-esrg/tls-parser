@@ -140,7 +140,34 @@ static CLIENT_EXTENSIONS1: &[u8] = &[
     }
 
     #[test]
-    fn test_tls_extension_keyshare_helloretryrequest() {
+    fn test_tls_extension_keyshare_clienthello() {
+        let empty = &b""[..];
+        let bytes = &[
+            0x00, 0x33, 0x00, 0x2b, 0x00, 0x29, 0x6a, 0x6a, 0x00, 0x01, 0x00, 0x00, 0x1d, 0x00,
+            0x20, 0x73, 0x53, 0xe1, 0x6d, 0x5f, 0xd4, 0xcc, 0x38, 0x77, 0x65, 0x23, 0x72, 0xd6,
+            0xa7, 0x5e, 0x32, 0x40, 0xc3, 0x8a, 0x5e, 0xc9, 0x79, 0xc2, 0x01, 0x27, 0x73, 0xfd,
+            0x48, 0x06, 0xf9, 0x43, 0x20,
+        ];
+        let expected = Ok((
+            empty,
+            vec![TlsExtension::KeyShare(vec![
+                KeyShareEntry {
+                    group: NamedGroup(0x6a6a),
+                    kx: &bytes[10..11],
+                },
+                KeyShareEntry {
+                    group: NamedGroup(0x1d),
+                    kx: &bytes[15..47],
+                },
+            ])],
+        ));
+
+        let res = parse_tls_client_hello_extensions(bytes);
+        assert_eq!(res, expected);
+    }
+
+    #[test]
+    fn test_tls_extension_keyshare_serverhello() {
         let empty = &b""[..];
         let bytes = &[
             0x00, 0x33, 0x00, 0x24, 0x00, 0x1d, 0x00, 0x20, 0xa2, 0x4e, 0x84, 0xfa, 0x82, 0x63,
@@ -151,12 +178,17 @@ static CLIENT_EXTENSIONS1: &[u8] = &[
         let expected = Ok((
             empty,
             vec![
-                TlsExtension::KeyShare(&bytes[4..40]),
+                // TlsExtension::KeyShare(&bytes[4..40]),
+                TlsExtension::KeyShare(vec![KeyShareEntry {
+                    group: NamedGroup(0x1d),
+                    kx: &bytes[8..40],
+                }]),
                 TlsExtension::SupportedVersions(vec![TlsVersion(0x7f17)]),
             ],
         ));
 
-        let res = parse_tls_extensions(bytes);
+        let res = parse_tls_server_hello_extensions(bytes);
+        println!("RES:{:?}", res);
         assert_eq!(res, expected);
     }
 

@@ -196,8 +196,8 @@ impl<'a> fmt::Debug for TlsExtension<'a> {
             TlsExtension::KeyShareOld(data) => {
                 write!(fmt, "TlsExtension::KeyShareOld(data={:?})", HexSlice(data))
             }
-            TlsExtension::KeyShare(data) => {
-                write!(fmt, "TlsExtension::KeyShare(data={:?})", HexSlice(data))
+            TlsExtension::KeyShare(ref v) => {
+                write!(fmt, "TlsExtension::KeyShare(data={:?})", v)
             }
             TlsExtension::PreSharedKey(data) => {
                 write!(fmt, "TlsExtension::PreSharedKey(data={:?})", HexSlice(data))

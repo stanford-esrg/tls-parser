@@ -15,7 +15,7 @@ use nom::combinator::{complete, cond, map, map_parser, opt, verify};
 // use nom::error::{make_error, ErrorKind};
 use nom::multi::{length_data, many0};
 use nom::number::streaming::{be_u16, be_u32, be_u8};
-use nom::{IResult};
+use nom::IResult;
 use nom_derive::{NomBE, Parse};
 use rusticata_macros::newtype_enum;
 use serde::Serialize;
@@ -124,7 +124,7 @@ pub enum TlsExtension<'a> {
     RecordSizeLimit(u16),
     SessionTicket(&'a [u8]),
     KeyShareOld(&'a [u8]),
-    KeyShare(&'a [u8]),
+    KeyShare(Vec<KeyShareEntry<'a>>),
     PreSharedKey(&'a [u8]),
     EarlyData(Option<u32>),
     SupportedVersions(Vec<TlsVersion>),
@@ -194,13 +194,14 @@ impl<'a> From<&'a TlsExtension<'a>> for TlsExtensionType {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, NomBE, Hash, Serialize)]
 pub struct KeyShareEntry<'a> {
     pub group: NamedGroup, // NamedGroup
-    pub kx: &'a [u8],      // Key Exchange Data
+    #[nom(Parse = "length_data(be_u16)")]
+    pub kx: &'a [u8], // Key Exchange Data
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, NomBE, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, NomBE, Hash, Serialize)]
 pub struct PskKeyExchangeMode(pub u8);
 
 newtype_enum! {
@@ -458,15 +459,35 @@ fn parse_tls_extension_key_share_old_content(
     map(take(ext_len), TlsExtension::KeyShareOld)(i)
 }
 
-fn parse_tls_extension_key_share_content(i: &[u8], ext_len: u16) -> IResult<&[u8], TlsExtension> {
-    map(take(ext_len), TlsExtension::KeyShare)(i)
+fn parse_keyshare_entry(i: &[u8]) -> IResult<&[u8], KeyShareEntry> {
+    KeyShareEntry::parse(i)
 }
 
+/// Key Share content depends on the current message type
+fn parse_tls_extension_client_shares_content(
+    i: &[u8],
+    _ext_len: u16,
+) -> IResult<&[u8], TlsExtension> {
+    let (i, v) = map_parser(length_data(be_u16), many0(complete(parse_keyshare_entry)))(i)?;
+    Ok((i, TlsExtension::KeyShare(v)))
+}
+
+/// Key Share content depends on the current message type
+fn parse_tls_extension_server_share_content(
+    i: &[u8],
+    _ext_len: u16,
+) -> IResult<&[u8], TlsExtension> {
+    let (i, t) = parse_keyshare_entry(i)?;
+    //let (i, t) = map_parser(take(ext_len), parse_keyshare_entry)(i)?;
+    Ok((i, TlsExtension::KeyShare(vec![t])))
+}
+
+/// Return a TlsExtension::KeyShareOld with just the bytes
 pub fn parse_tls_extension_key_share(i: &[u8]) -> IResult<&[u8], TlsExtension> {
     let (i, _) = tag([0x00, 0x33])(i)?;
     let (i, ext_len) = be_u16(i)?;
     map_parser(take(ext_len), move |d| {
-        parse_tls_extension_key_share_content(d, ext_len)
+        parse_tls_extension_key_share_old_content(d, ext_len)
     })(i)
 }
 
@@ -675,8 +696,8 @@ pub fn parse_tls_client_hello_extension(i: &[u8]) -> IResult<&[u8], TlsExtension
         45 => parse_tls_extension_psk_key_exchange_modes_content(ext_data),
         48 => parse_tls_extension_oid_filters(ext_data),
         49 => parse_tls_extension_post_handshake_auth_content(ext_data, ext_len),
-        51 => parse_tls_extension_key_share_content(ext_data, ext_len), // XXX request
-        13172 => parse_tls_extension_npn_content(ext_data, ext_len),    // XXX must be empty
+        51 => parse_tls_extension_client_shares_content(ext_data, ext_len),
+        13172 => parse_tls_extension_npn_content(ext_data, ext_len), // XXX must be empty
         0xff01 => parse_tls_extension_renegotiation_info_content(ext_data),
         0xffce => parse_tls_extension_encrypted_server_name(ext_data),
         _ => Ok((
@@ -713,7 +734,7 @@ pub fn parse_tls_server_hello_extension(i: &[u8]) -> IResult<&[u8], TlsExtension
         42 => parse_tls_extension_early_data_content(ext_data, ext_len),
         43 => parse_tls_extension_supported_versions_content(ext_data, ext_len), // ok XXX only one
         44 => parse_tls_extension_cookie_content(ext_data, ext_len),
-        51 => parse_tls_extension_key_share_content(ext_data, ext_len), // XXX selected entry
+        51 => parse_tls_extension_server_share_content(ext_data, ext_len),
         13172 => parse_tls_extension_npn_content(ext_data, ext_len),
         0xff01 => parse_tls_extension_renegotiation_info_content(ext_data),
         _ => Ok((
@@ -756,7 +777,7 @@ pub fn parse_tls_extension(i: &[u8]) -> IResult<&[u8], TlsExtension> {
         45 => parse_tls_extension_psk_key_exchange_modes_content(ext_data),
         48 => parse_tls_extension_oid_filters(ext_data),
         49 => parse_tls_extension_post_handshake_auth_content(ext_data, ext_len),
-        51 => parse_tls_extension_key_share_content(ext_data, ext_len),
+        51 => parse_tls_extension_key_share_old_content(ext_data, ext_len),
         13172 => parse_tls_extension_npn_content(ext_data, ext_len),
         0xff01 => parse_tls_extension_renegotiation_info_content(ext_data),
         0xffce => parse_tls_extension_encrypted_server_name(ext_data),
