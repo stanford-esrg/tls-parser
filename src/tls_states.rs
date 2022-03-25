@@ -45,6 +45,12 @@ pub enum TlsState {
     Invalid,
 }
 
+impl Default for TlsState{
+    fn default() -> Self {
+        TlsState::None
+    }
+}
+
 #[rustfmt::skip]
 fn tls_state_transition_handshake(state: TlsState, msg: &TlsMessageHandshake, to_server:bool) -> Result<TlsState,StateChangeError> {
     match (state,msg,to_server) {
