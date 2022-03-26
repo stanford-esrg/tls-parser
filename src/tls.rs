@@ -212,7 +212,10 @@ impl AsRef<u16> for TlsCipherSuiteID {
 
 impl fmt::Display for TlsCipherSuiteID {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.0)
+        match TlsCipherSuite::from_id(self.0) {
+            Some(c) => write!(f, "{}", c.name),
+            None => write!(f, "UNKNOWN_CIPHER"),
+        }
     }
 }
 
