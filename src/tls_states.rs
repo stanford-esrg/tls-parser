@@ -45,7 +45,7 @@ pub enum TlsState {
     Invalid,
 }
 
-impl Default for TlsState{
+impl Default for TlsState {
     fn default() -> Self {
         TlsState::None
     }

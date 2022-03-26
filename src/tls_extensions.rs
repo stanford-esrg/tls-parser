@@ -8,6 +8,7 @@
 
 use crate::tls::{parse_tls_versions, TlsCipherSuiteID, TlsVersion};
 use crate::tls_ec::{parse_named_groups, NamedGroup};
+use crate::tls_sign_hash::SignatureScheme;
 use alloc::{vec, vec::Vec};
 use core::convert::From;
 use nom::bytes::streaming::{tag, take};
@@ -119,7 +120,7 @@ pub enum TlsExtension<'a> {
     StatusRequest(Option<(CertificateStatusType, &'a [u8])>),
     EllipticCurves(Vec<NamedGroup>),
     EcPointFormats(&'a [u8]),
-    SignatureAlgorithms(Vec<u16>),
+    SignatureAlgorithms(Vec<SignatureScheme>),
     CompressCertificate(&'a [u8]),
     RecordSizeLimit(u16),
     SessionTicket(&'a [u8]),
@@ -342,10 +343,11 @@ pub fn parse_tls_extension_ec_point_formats(i: &[u8]) -> IResult<&[u8], TlsExten
     )(i)
 }
 
-/// Parse 'Signature Algorithms' extension (rfc8446, TLS 1.3 only)
+/// Parse 'Signature Algorithms' extension (rfc8446, TLS 1.3 only, has backwards compatibility
+/// with pre TLS 1.3 Signature Algorithms)
 pub fn parse_tls_extension_signature_algorithms_content(i: &[u8]) -> IResult<&[u8], TlsExtension> {
-    let (i, l) = map_parser(length_data(be_u16), many0(complete(be_u16)))(i)?;
-    Ok((i, TlsExtension::SignatureAlgorithms(l))) // XXX SignatureAlgorithms or SignatureScheme
+    let (i, l) = map_parser(length_data(be_u16), many0(complete(SignatureScheme::parse)))(i)?;
+    Ok((i, TlsExtension::SignatureAlgorithms(l)))
 }
 
 pub fn parse_tls_extension_signature_algorithms(i: &[u8]) -> IResult<&[u8], TlsExtension> {

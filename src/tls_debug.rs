@@ -171,13 +171,13 @@ impl<'a> fmt::Debug for TlsExtension<'a> {
                 let v2: Vec<_> = v
                     .iter()
                     .map(|&alg| {
-                        let s = format!("{}", SignatureScheme(alg));
+                        let s = format!("{}", alg);
                         if s.starts_with("SignatureScheme") {
                             format!(
                                 "{}",
                                 SignatureAndHashAlgorithm {
-                                    hash: HashAlgorithm((alg >> 8) as u8),
-                                    sign: SignAlgorithm((alg & 0xff) as u8)
+                                    hash: HashAlgorithm((alg.0 >> 8) as u8),
+                                    sign: SignAlgorithm((alg.0 & 0xff) as u8)
                                 }
                             )
                         } else {
