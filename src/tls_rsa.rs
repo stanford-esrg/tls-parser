@@ -6,7 +6,7 @@ use nom_derive::*;
 /// RSA parameters, defined in [RFC2246] section 7.4.3
 /// Deprecated, but could appear in RSA_EXPORT cipher suites
 /// ServerKeyExchange messages.
-#[derive(Debug, PartialEq, NomBE, Hash)]
+#[derive(PartialEq, NomBE, Hash)]
 pub struct ServerRSAParams<'a> {
     /// The modulus of the server's temporary RSA key.
     #[nom(Parse = "length_data(be_u16)")]

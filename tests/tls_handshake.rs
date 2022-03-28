@@ -500,7 +500,7 @@ static CLIENT_REPLY1: &[u8] = &[
                 len: 70,
             },
             msg: vec![TlsMessage::Handshake(
-                TlsMessageHandshake::ClientKeyExchange(TlsClientKeyExchangeContents{
+                TlsMessageHandshake::ClientKeyExchange(TlsClientKeyExchangeContents {
                     parameters: &bytes[9..],
                 }),
             )],

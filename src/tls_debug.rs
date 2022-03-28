@@ -3,6 +3,7 @@ use crate::tls_alert::*;
 use crate::tls_dh::*;
 use crate::tls_ec::*;
 use crate::tls_extensions::*;
+use crate::tls_rsa::*;
 use crate::tls_sign_hash::*;
 use alloc::format;
 use alloc::vec::Vec;
@@ -101,6 +102,16 @@ impl fmt::Debug for TlsMessageAlert {
     }
 }
 
+// ------------------------- tls_rsa.rs ------------------------------
+impl<'a> fmt::Debug for ServerRSAParams<'a> {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        fmt.debug_struct("ServerRSAParams")
+            .field("modulus", &HexSlice(self.modulus))
+            .field("exponent", &HexSlice(self.exponent))
+            .finish()
+    }
+}
+
 // ------------------------- tls_dh.rs ------------------------------
 impl<'a> fmt::Debug for ServerDHParams<'a> {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
@@ -110,6 +121,14 @@ impl<'a> fmt::Debug for ServerDHParams<'a> {
             .field("dh_p", &HexSlice(self.dh_p))
             .field("dh_g", &HexSlice(self.dh_g))
             .field("dh_ys", &HexSlice(self.dh_ys))
+            .finish()
+    }
+}
+
+impl<'a> fmt::Debug for ClientDHPublic<'a> {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        fmt.debug_struct("ClientDHPublic")
+            .field("dh_yc", &HexSlice(self.dh_yc))
             .finish()
     }
 }

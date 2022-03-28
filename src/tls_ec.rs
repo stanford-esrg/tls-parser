@@ -7,7 +7,7 @@ use nom_derive::*;
 use rusticata_macros::newtype_enum;
 use serde::Serialize;
 
-/// Named curves, as defined in [RFC4492](https://tools.ietf.org/html/rfc4492), [RFC7027](https://tools.ietf.org/html/rfc7027), [RFC7919](https://tools.ietf.org/html/rfc7919) and
+/// Named curves, as defined in [RFC8422](https://tools.ietf.org/html/rfc8422), [RFC7027](https://tools.ietf.org/html/rfc7027), [RFC7919](https://tools.ietf.org/html/rfc7919) and
 /// [IANA Supported Groups
 /// Registry](https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-8)
 #[derive(Default, Clone, Copy, PartialEq, Eq, NomBE, Hash, Serialize)]
@@ -130,7 +130,7 @@ pub struct ECPoint<'a> {
 }
 
 /// Elliptic curve parameters, conveyed verbosely as a prime field, as
-/// defined in [RFC4492](https://tools.ietf.org/html/rfc4492) section 5.4
+/// defined in [RFC8422](https://tools.ietf.org/html/rfc8422) section 5.4
 #[derive(Debug, PartialEq, NomBE, Hash, Serialize)]
 pub struct ExplicitPrimeContent<'a> {
     #[nom(Parse = "length_data(be_u8)")]
@@ -149,7 +149,7 @@ pub struct ExplicitPrimeContent<'a> {
 pub enum ECParametersContent<'a> {
     #[nom(Selector = "ECCurveType::ExplicitPrime")]
     ExplicitPrime(ExplicitPrimeContent<'a>),
-    // TODO ExplicitChar2 is defined in [RFC4492] section 5.4
+    // TODO ExplicitChar2 is defined in [RFC8422] section 5.4
     // #[nom(Selector="ECCurveType::ExplicitChar2")]
     // ExplicitChar2(&'a [u8]),
     #[nom(Selector = "ECCurveType::NamedGroup")]
@@ -157,7 +157,7 @@ pub enum ECParametersContent<'a> {
 }
 
 /// Elliptic curve parameters,
-/// defined in [RFC4492](https://tools.ietf.org/html/rfc4492) section 5.4
+/// defined in [RFC8422](https://tools.ietf.org/html/rfc8422) section 5.4
 #[derive(PartialEq, NomBE, Hash, Serialize)]
 pub struct ECParameters<'a> {
     /// Should match a [ECCurveType](enum.ECCurveType.html) value
@@ -166,8 +166,8 @@ pub struct ECParameters<'a> {
     pub params_content: ECParametersContent<'a>,
 }
 
-/// ECDH parameters
-/// defined in [RFC4492](https://tools.ietf.org/html/rfc4492) section 5.4
+/// Server ECDH parameters
+/// defined in [RFC8422](https://tools.ietf.org/html/rfc8422) section 5.4
 #[derive(Debug, PartialEq, NomBE, Hash)]
 pub struct ServerECDHParams<'a> {
     pub curve_params: ECParameters<'a>,
@@ -196,6 +196,18 @@ pub fn parse_ec_parameters(i: &[u8]) -> IResult<&[u8], ECParameters> {
 }
 
 #[inline]
-pub fn parse_ecdh_params(i: &[u8]) -> IResult<&[u8], ServerECDHParams> {
+pub fn parse_server_ecdh_params(i: &[u8]) -> IResult<&[u8], ServerECDHParams> {
     ServerECDHParams::parse(i)
+}
+
+/// Client ECDH parameters
+/// defined in [RFC8422](https://tools.ietf.org/html/rfc8422) section 5.7
+#[derive(Debug, PartialEq, NomBE, Hash)]
+pub struct ClientECDiffieHellmanPublic<'a> {
+    pub ecdh_yc: ECPoint<'a>,
+}
+
+#[inline]
+pub fn parse_client_ecdh_params(i: &[u8]) -> IResult<&[u8], ClientECDiffieHellmanPublic> {
+    ClientECDiffieHellmanPublic::parse(i)
 }
