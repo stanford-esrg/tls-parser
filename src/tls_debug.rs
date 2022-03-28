@@ -112,6 +112,14 @@ impl<'a> fmt::Debug for ServerRSAParams<'a> {
     }
 }
 
+impl<'a> fmt::Debug for EncryptedPreMasterSecret<'a> {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        fmt.debug_struct("EncryptedPreMasterSecret")
+            .field("data", &HexSlice(self.data))
+            .finish()
+    }
+}
+
 // ------------------------- tls_dh.rs ------------------------------
 impl<'a> fmt::Debug for ServerDHParams<'a> {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
