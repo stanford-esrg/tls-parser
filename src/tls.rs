@@ -17,7 +17,6 @@ use serde::Serialize;
 
 use crate::tls_alert::*;
 use crate::tls_ciphers::*;
-use crate::tls_ec::ECPoint;
 
 pub use nom::{Err, IResult};
 
@@ -440,12 +439,11 @@ pub struct TlsServerKeyExchangeContents<'a> {
 
 /// Client key exchange parameters
 ///
-/// Content depends on the selected key exchange method.
+/// This is an opaque struct, since the content depends on the selected
+/// key exchange method.
 #[derive(Clone, PartialEq, Hash)]
-pub enum TlsClientKeyExchangeContents<'a> {
-    Dh(&'a [u8]),
-    Ecdh(ECPoint<'a>),
-    Unknown(&'a [u8]),
+pub struct TlsClientKeyExchangeContents<'a> {
+    pub parameters: &'a [u8],
 }
 
 /// Certificate status response, as defined in [RFC6066](https://tools.ietf.org/html/rfc6066) section 8
@@ -755,20 +753,13 @@ fn parse_tls_handshake_msg_certificateverify(
     map(take(len), TlsMessageHandshake::CertificateVerify)(i)
 }
 
-pub(crate) fn parse_tls_clientkeyexchange(
-    len: usize,
-) -> impl FnMut(&[u8]) -> IResult<&[u8], TlsClientKeyExchangeContents> {
-    move |i| map(take(len), TlsClientKeyExchangeContents::Unknown)(i)
-}
-
 fn parse_tls_handshake_msg_clientkeyexchange(
     i: &[u8],
     len: usize,
 ) -> IResult<&[u8], TlsMessageHandshake> {
-    map(
-        parse_tls_clientkeyexchange(len),
-        TlsMessageHandshake::ClientKeyExchange,
-    )(i)
+    map(take(len), |ext| {
+        TlsMessageHandshake::ClientKeyExchange(TlsClientKeyExchangeContents { parameters: ext })
+    })(i)
 }
 
 fn parse_certrequest_nosigalg(i: &[u8]) -> IResult<&[u8], TlsMessageHandshake> {

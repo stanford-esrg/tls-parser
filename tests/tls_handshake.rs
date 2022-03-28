@@ -500,9 +500,9 @@ static CLIENT_REPLY1: &[u8] = &[
                 len: 70,
             },
             msg: vec![TlsMessage::Handshake(
-                TlsMessageHandshake::ClientKeyExchange(TlsClientKeyExchangeContents::Unknown(
-                    &bytes[9..],
-                )),
+                TlsMessageHandshake::ClientKeyExchange(TlsClientKeyExchangeContents{
+                    parameters: &bytes[9..],
+                }),
             )],
         };
         assert_eq!(parse_tls_plaintext(bytes), Ok((empty, expected)));

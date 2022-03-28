@@ -205,10 +205,11 @@ fn parse_dtls_handshake_msg_clientkeyexchange(
     i: &[u8],
     len: usize,
 ) -> IResult<&[u8], DTLSMessageHandshakeBody> {
-    map(
-        parse_tls_clientkeyexchange(len),
-        DTLSMessageHandshakeBody::ClientKeyExchange,
-    )(i)
+    map(take(len), |ext| {
+        DTLSMessageHandshakeBody::ClientKeyExchange(TlsClientKeyExchangeContents {
+            parameters: ext,
+        })
+    })(i)
 }
 
 fn parse_dtls_handshake_msg_certificate(i: &[u8]) -> IResult<&[u8], DTLSMessageHandshakeBody> {

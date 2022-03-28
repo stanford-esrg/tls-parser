@@ -36,13 +36,9 @@ static RSA_PARAMS: &[u8] = &[
         let bytes = RSA_PARAMS;
         let modulus = &bytes[2..66];
         let exponent = &bytes[68..71];
-        let expected1 = ServerRSAParams {
-            modulus,
-            exponent,
-        };
+        let expected1 = ServerRSAParams { modulus, exponent };
         let expected2 = &bytes[71..];
         let res = parse_rsa_params(bytes);
         assert_eq!(res, Ok((expected2, expected1)));
     }
-
-} 
+}
