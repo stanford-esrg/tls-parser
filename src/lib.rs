@@ -149,6 +149,7 @@ mod tls_debug;
 mod tls_dh;
 mod tls_ec;
 mod tls_extensions;
+mod tls_rsa;
 mod tls_sign_hash;
 mod tls_states;
 
@@ -160,6 +161,7 @@ pub use tls_ciphers::*;
 pub use tls_dh::*;
 pub use tls_ec::*;
 pub use tls_extensions::*;
+pub use tls_rsa::*;
 pub use tls_sign_hash::*;
 pub use tls_states::*;
 
