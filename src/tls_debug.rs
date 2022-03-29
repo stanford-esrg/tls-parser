@@ -185,9 +185,9 @@ impl<'a> fmt::Debug for TlsExtension<'a> {
             TlsExtension::StatusRequest(data) => {
                 write!(fmt, "TlsExtension::StatusRequest({:?})", data)
             }
-            TlsExtension::EllipticCurves(ref v) => {
+            TlsExtension::SupportedGroups(ref v) => {
                 let v2: Vec<_> = v.iter().map(|&curve| format!("{}", curve)).collect();
-                write!(fmt, "TlsExtension::EllipticCurves({:?})", v2)
+                write!(fmt, "TlsExtension::SupportedGroups({:?})", v2)
             }
             TlsExtension::EcPointFormats(v) => write!(fmt, "TlsExtension::EcPointFormats({:?})", v),
             TlsExtension::SignatureAlgorithms(ref v) => {

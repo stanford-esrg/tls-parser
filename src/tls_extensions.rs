@@ -118,7 +118,7 @@ pub enum TlsExtension<'a> {
     SNI(Vec<(SNIType, &'a [u8])>),
     MaxFragmentLength(u8),
     StatusRequest(Option<(CertificateStatusType, &'a [u8])>),
-    EllipticCurves(Vec<NamedGroup>),
+    SupportedGroups(Vec<NamedGroup>),
     EcPointFormats(&'a [u8]),
     SignatureAlgorithms(Vec<SignatureScheme>),
     CompressCertificate(&'a [u8]),
@@ -165,7 +165,7 @@ impl<'a> From<&'a TlsExtension<'a>> for TlsExtensionType {
             TlsExtension::SNI(_)                        => TlsExtensionType::ServerName,
             TlsExtension::MaxFragmentLength(_)          => TlsExtensionType::MaxFragmentLength,
             TlsExtension::StatusRequest(_)              => TlsExtensionType::StatusRequest,
-            TlsExtension::EllipticCurves(_)             => TlsExtensionType::SupportedGroups,
+            TlsExtension::SupportedGroups(_)             => TlsExtensionType::SupportedGroups,
             TlsExtension::EcPointFormats(_)             => TlsExtensionType::EcPointFormats,
             TlsExtension::SignatureAlgorithms(_)        => TlsExtensionType::SignatureAlgorithms,
             TlsExtension::CompressCertificate(_)        => TlsExtensionType::CompressCertificate,
@@ -315,19 +315,20 @@ pub fn parse_tls_extension_status_request(i: &[u8]) -> IResult<&[u8], TlsExtensi
     })(i)
 }
 
-// defined in rfc8422
-pub fn parse_tls_extension_elliptic_curves_content(i: &[u8]) -> IResult<&[u8], TlsExtension> {
+// defined in rfc8422, rfc7919
+// Renamed from "elliptic_curves"
+pub fn parse_tls_extension_supported_groups_content(i: &[u8]) -> IResult<&[u8], TlsExtension> {
     map_parser(
         length_data(be_u16),
-        map(parse_named_groups, TlsExtension::EllipticCurves),
+        map(parse_named_groups, TlsExtension::SupportedGroups),
     )(i)
 }
 
-pub fn parse_tls_extension_elliptic_curves(i: &[u8]) -> IResult<&[u8], TlsExtension> {
+pub fn parse_tls_extension_supported_groups(i: &[u8]) -> IResult<&[u8], TlsExtension> {
     let (i, _) = tag([0x00, 0x0a])(i)?;
     map_parser(
         length_data(be_u16),
-        parse_tls_extension_elliptic_curves_content,
+        parse_tls_extension_supported_groups_content,
     )(i)
 }
 
@@ -679,7 +680,7 @@ pub fn parse_tls_client_hello_extension(i: &[u8]) -> IResult<&[u8], TlsExtension
         0 => parse_tls_extension_sni_content(ext_data),
         1 => parse_tls_extension_max_fragment_length_content(ext_data),
         5 => parse_tls_extension_status_request_content(ext_data, ext_len),
-        10 => parse_tls_extension_elliptic_curves_content(ext_data),
+        10 => parse_tls_extension_supported_groups_content(ext_data),
         11 => parse_tls_extension_ec_point_formats_content(ext_data),
         13 => parse_tls_extension_signature_algorithms_content(ext_data),
         15 => parse_tls_extension_heartbeat_content(ext_data),
@@ -759,7 +760,7 @@ pub fn parse_tls_extension(i: &[u8]) -> IResult<&[u8], TlsExtension> {
         0 => parse_tls_extension_sni_content(ext_data),
         1 => parse_tls_extension_max_fragment_length_content(ext_data),
         5 => parse_tls_extension_status_request_content(ext_data, ext_len),
-        10 => parse_tls_extension_elliptic_curves_content(ext_data),
+        10 => parse_tls_extension_supported_groups_content(ext_data),
         11 => parse_tls_extension_ec_point_formats_content(ext_data),
         13 => parse_tls_extension_signature_algorithms_content(ext_data),
         15 => parse_tls_extension_heartbeat_content(ext_data),
