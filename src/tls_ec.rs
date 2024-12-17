@@ -54,6 +54,7 @@ impl debug NamedGroup {
     Ffdhe4096 = 0x102,
     Ffdhe6144 = 0x103,
     Ffdhe8192 = 0x104,
+    X25519Kyber768Draft00 = 0x6399,
     ArbitraryExplicitPrimeCurves = 0xFF01,
     ArbitraryExplicitChar2Curves = 0xFF02,
 }
